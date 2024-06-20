@@ -16,7 +16,9 @@ load_dotenv()
 
 # Parámetros de la API
 api_key = os.getenv('API_KEY')
+
 city = 'Madrid'
+#url2=f'http://api.openweathermap.org/data/2.5/forecast?id=524901&appid={api_key}'
 url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}'
 
 print(url)
@@ -38,10 +40,5 @@ with open(filename, 'w') as f:
     json.dump(data, f)
 
 
-# Leer el archivo JSON y cargarlo en un DataFrame
-df = pd.read_json('filename')
-
-# Mostrar las primeras filas del DataFrame
-print(df.head())
-
+print(json.dumps(data, indent=4))
 
