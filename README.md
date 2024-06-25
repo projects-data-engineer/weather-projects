@@ -2,7 +2,8 @@
 
 0. [Entorno Virtual](#schema0)
 1. [Archivo .env](#schema1)
-2. [Esctructura del proyecto](#schema2)
+2. [Claves de AWS](#schema2)
+3. [Esctructura del proyecto](#schema3)
 
 
 <hr>
@@ -93,11 +94,35 @@ print(f"Database User: {db_user}")
 
 Añadir al archivo `.gitignore` el archivo `.env` para tener protegidas las claves y no subirlas a git
 
+
 <hr>
 
 <a name="schema2"></a>
 
-## 2. Esctructura del proyecto
+## 2. Claves de AWS
+
+1. Crear cuenta de amazon
+2. Crear usuario no root.
+3. Si ya se han usado el usario anterior y no te acuerdad de las claves `aws_access_key_id` y `aws_secret_access_key` usar el siguiente comando para buscar la configuración de AWS
+```bash
+ls ~/.aws
+```
+Deberían aparecer las siguientes carpetas
+```bash
+config  credentials
+```
+4. Abrir el visual con en esa ruta
+```bash
+code ~/.aws
+```
+5. Copiar las crendeciales a un archivo `.env`
+
+
+<hr>
+
+<a name="schema3"></a>
+
+## 3. Esctructura del proyecto
 
 1. Requisitos del Proyecto
 - Lenguaje de programación: Python

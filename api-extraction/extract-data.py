@@ -11,17 +11,13 @@ import glob
 
 load_dotenv()
 
-
-
-
 # Parámetros de la API
 api_key = os.getenv('API_KEY')
 
 city = 'Madrid'
-#url2=f'http://api.openweathermap.org/data/2.5/forecast?id=524901&appid={api_key}'
+
 url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}'
 
-print(url)
 
 # Solicitud a la API
 response = requests.get(url)
@@ -34,11 +30,17 @@ if response.status_code != 200:
 
 data = response.json()
 
-# Guardar los datos en un archivo JSON
-filename = f'./data/weather_data_{datetime.now().strftime("%Y%m%d%H%M%S")}.json'
-with open(filename, 'w') as f:
-    json.dump(data, f)
+# # Guardar los datos en un archivo JSON
+filename = f'data/weather_data_{datetime.now().strftime("%Y%m%d%H%M%S")}.json'
+
+# Convertir el diccionario a una cadena JSON
+json_data = json.dumps(data)
 
 
-print(json.dumps(data, indent=4))
+# Subir el archivo a S3
+s3 = boto3.client('s3')
+bucket_name = 'weather-bucket-data-project'
 
+s3.put_object(Bucket=bucket_name, Key=filename, Body=json_data)
+
+print(f'Datos guardados en S3: {filename}')
