@@ -29,13 +29,13 @@ if response.status_code != 200:
 
 
 data = response.json()
+print(json.dumps(data, indent=4))
 
 # # Guardar los datos en un archivo JSON
 filename = f'data/weather_data_{datetime.now().strftime("%Y%m%d%H%M%S")}.json'
 
 # Convertir el diccionario a una cadena JSON
 json_data = json.dumps(data)
-
 
 # Subir el archivo a S3
 s3 = boto3.client('s3')

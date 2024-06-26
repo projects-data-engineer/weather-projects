@@ -4,7 +4,7 @@
 1. [Archivo .env](#schema1)
 2. [Claves de AWS](#schema2)
 3. [Esctructura del proyecto](#schema3)
-
+4. [Limpieza de Datos utilizando AWS Lambda](#schema4)
 
 <hr>
 
@@ -140,3 +140,68 @@ code ~/.aws
     - Implementaremos una función Lambda en AWS para la limpieza y transformación de datos.
 - Almacenamiento y Exposición de Resultados:
     - Guardaremos los datos limpios en una base de datos gestionada por AWS (por ejemplo, Amazon RDS) y utilizaremos Amazon QuickSight para la visualización de datos.
+
+
+<hr>
+
+<a name="schema4"></a>
+
+## 4. Limpieza de Datos utilizando AWS Lambda
+
+### **Paso 0: Crear un bucket s3 para guardar los datos limpios
+
+- **A. Crear un Bucket en Amazon S3**
+    1. Navegar a la Consola de Amazon S3:
+
+    2. Crear un Nuevo Bucket:
+
+        Haz clic en "Create bucket".
+Asigna un nombre único a tu bucket (por ejemplo, my-weather-data-bucket-clean).
+Configura las opciones necesarias y crea el bucket.
+
+
+### **Paso 1: Crear la Función Lambda**
+- **A. Crear la Función Lambda en AWS**
+    1. Navegar a la Consola de AWS Lambda:
+    2. Crear una Nueva Función:
+        Haz clic en "Create function".
+        - Selecciona "Author from scratch".
+        - Asigna un nombre a tu función (por ejemplo, `WeatherDataCleaner`).
+        - Selecciona el runtime como `Python 3.8` (o la versión que prefieras).
+        - Selecciona o crea un rol de ejecución con permisos necesarios (ver sección de permisos más abajo).
+    3. Configurar el Código de la Función:
+
+        - En la sección de "Function code", copia y pega el código proporcionado en el editor de código de Lambda.[Este código](./data-cleaning-lambda/lambda_function.py)
+### **Paso 2: Configurar Permisos y Roles**
+- **A. Crear un Rol de IAM para la Función Lambda**
+    1. Navegar a la Consola de IAM:
+
+    2. Crear un Nuevo Rol:
+
+        - Haz clic en "Roles" y luego en "Create role".
+        - Selecciona "Lambda" como el tipo de entidad de confianza.
+        - Adjunta las políticas gestionadas por AWS: `AmazonS3FullAccess` y `AWSLambdaBasicExecutionRole`.
+    3. Asignar el Rol a la Función Lambda:
+
+        - Regresa a la consola de Lambda y asigna este rol a tu función Lambda en la sección "Execution role".
+
+### **Paso 4: Configurar un Trigger en S3**
+1. Agregar un Trigger en la Función Lambda:
+    - En la consola de Lambda, en la configuración de tu función, haz clic en "Add trigger".
+    - Selecciona "S3" como la fuente del trigger.
+    - Selecciona el bucket que contenga los datos `weather-bucket-data-project`.
+    - Configura el evento para que se active en "ObjectCreated (All)".
+    - Crear una **variable de entorno** en la lambda con el bucket donde se va a guardar los datos `my-weather-data-bucket-clean`
+    - Guarda la configuración.
+
+
+
+Bucket `weather-bucket-data-project`
+
+![Data](./img/s3_data.png)
+![Data](./img/s3_data_2.png)
+
+Bucket `my-weather-data-bucket-clean`
+
+![Data clean](./img/s3_clean.png)
+![Data clean](./img/s3_clean_data.png)
