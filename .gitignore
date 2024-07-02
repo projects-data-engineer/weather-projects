@@ -1,3 +1,6 @@
 weather-projects
 .env
 data
+*.zip
+pymysql
+PyMySQL*

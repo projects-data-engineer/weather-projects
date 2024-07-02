@@ -5,6 +5,8 @@
 2. [Claves de AWS](#schema2)
 3. [Esctructura del proyecto](#schema3)
 4. [Limpieza de Datos utilizando AWS Lambda](#schema4)
+5. [Almacenamiento en Amazon RDS](#schema5)
+6. [Unable to import module 'lambda_function': No module named 'pymysql'](#schema6)
 
 <hr>
 
@@ -181,6 +183,7 @@ Configura las opciones necesarias y crea el bucket.
         - Haz clic en "Roles" y luego en "Create role".
         - Selecciona "Lambda" como el tipo de entidad de confianza.
         - Adjunta las políticas gestionadas por AWS: `AmazonS3FullAccess` y `AWSLambdaBasicExecutionRole`.
+        ![S3](./img/l_s3_role.png)
     3. Asignar el Rol a la Función Lambda:
 
         - Regresa a la consola de Lambda y asigna este rol a tu función Lambda en la sección "Execution role".
@@ -205,3 +208,113 @@ Bucket `my-weather-data-bucket-clean`
 
 ![Data clean](./img/s3_clean.png)
 ![Data clean](./img/s3_clean_data.png)
+
+
+<hr>
+
+<a name="schema5"></a>
+
+## 5. Almacenamiento en Amazon RDS 
+
+### **Paso 1: Crear una Instancia de Amazon RDS**
+1. Abrir la Consola de RDS:
+
+    - Ve a la consola de administración de AWS y selecciona "RDS" en la sección "Database".
+2. Crear una Nueva Instancia de RDS:
+
+    - Haz clic en "Create database".
+    - Selecciona "Standard Create".
+    - Elige "MySQL" como el motor de base de datos.
+    - Configura la versión de MySQL y el tipo de instancia que prefieras (por ejemplo, `db.t2.micro` para el plan gratuito).
+3. Configurar la Autenticación:
+
+    - Ingresa un nombre de usuario y contraseña para el administrador de la base de datos.
+    - Nota: Guarda estos detalles porque los necesitarás para la configuración de la función Lambda.
+4. Configurar la Red:
+
+    - Selecciona la VPC y las subnets donde deseas que se implemente la base de datos.
+    - Asegúrate de que "Public accessibility" esté habilitado si necesitas acceder a la base de datos desde fuera de la VPC.
+5. Configuraciones Adicionales:
+
+    - Configura parámetros adicionales según tus necesidades (por ejemplo, grupo de seguridad, parámetros de backup, etc.).
+    - Haz clic en "Create database".
+6. Obtener el Endpoint de la Base de Datos:
+
+    - Una vez creada la instancia, ve a la sección "Databases" y selecciona tu nueva base de datos.
+    - Copia el "Endpoint" que se mostrará, porque lo necesitarás para la función Lambda.
+
+## **Paso 2: Crear la Función Lambda para Insertar Datos en RDS**
+1. Crear una Nueva Función Lambda:
+
+    - Ve a la consola de Lambda y haz clic en "Create function".
+    - Selecciona "Author from scratch".
+    - Ingresa un nombre para la función y selecciona el entorno de ejecución (por ejemplo, Python 3.8).
+2. Configurar el Rol de Ejecución:
+
+    - Crea un nuevo rol con permisos básicos de Lambda y añade permisos adicionales para conectarse a RDS.
+    - Puedes usar una política administrada como `AmazonRDSFullAccess` para este propósito.
+    ![Role](./img/l_rds_role.png)
+3. Subir el Código de la Función:
+
+    - Usa el siguiente código para insertar datos en la base de datos RDS:
+    [Code](./rds-lambda/rds_lambda_function.py)
+4. Agregar Triggers a la Función Lambda:
+
+    - Configura un trigger de S3 para que la función Lambda se ejecute cuando se cree un nuevo archivo en el bucket de S3.
+
+<hr>
+
+<a name="schema6"></a>
+
+## 6. Unable to import module 'lambda_function': No module named 'pymysql'
+
+El error `Runtime.ImportModuleError: Unable to import module 'lambda_function': No module named 'pymysql'` indica que la función Lambda no puede encontrar el módulo `pymysql` porque no está incluido en el entorno de ejecución de Lambda por defecto.
+
+Para solucionar este problema, debes incluir `pymysql` en un paquete de implementación (deployment package) y luego subir ese paquete a Lambda. 
+
+### **Paso 1: Preparar el Entorno Virtual**
+1. Activar el Entorno Virtual:
+```bash 
+cd /ruta/a/tu/proyecto
+source weather-projects/bin/activate  
+```
+
+### **Paso 2: Instalar Dependencias en la Carpeta `rds_lambda`**
+Dentro de tu entorno virtual, instala pymysql en la carpeta `rds_lambda`.
+```bash
+pip install pymysql -t rds_lambda/
+```
+
+### **Paso 3: Crear el Paquete de Implementación**
+1. Navegar a la Carpeta `rds_lambda`:
+
+```bash
+cd rds_lambda
+```
+2. Crear el Archivo ZIP:
+Comprime todo el contenido de la carpeta rds_lambda en un archivo ZIP.
+
+```bash
+zip -r ../lambda_package.zip .
+```
+### **Paso 4: Subir el Paquete a Lambda**
+1. Subir el Paquete a Lambda:
+
+    - Ve a la consola de AWS Lambda.
+    - Selecciona tu función Lambda.
+    - En la pestaña "Code", selecciona "Upload from" y luego ".zip file".
+    - Sube el archivo `lambda_package.zip`.
+### **Paso 5: Configurar la Función Lambda**
+1. Asignar el Rol Correcto:
+Asegúrate de que la función Lambda tenga el rol con los permisos adecuados (S3 y RDS).
+
+2. Configurar Variables de Entorno:
+En la consola de Lambda, configura las variables de entorno necesarias, como las credenciales de la base de datos RDS.
+
+### **Paso 6: Prueba la Función Lambda**
+1. Configura un Evento de Prueba:
+En la consola de Lambda, crea un evento de prueba que simule un evento S3.
+
+2. Ejecuta la Función y Verifica los Logs:
+Ejecuta la función Lambda y verifica los logs en CloudWatch para asegurarte de que la función se está ejecutando correctamente y que los datos se insertan en RDS como se espera.
+
