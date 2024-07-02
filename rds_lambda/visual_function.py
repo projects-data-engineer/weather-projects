@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Parámetros de conexión a la RDS
-host = 'weather-db.crko62g8qujh.us-east-1.rds.amazonaws.com'
+host = 'endpoint'
 port = 3306  # Puerto predeterminado de MySQL
 user = 'admin'
-password = 'nanuk102'
+password = 'password'
 database = 'weather-db'
 
 # Conexión a la base de datos

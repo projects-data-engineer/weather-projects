@@ -7,6 +7,7 @@
 4. [Limpieza de Datos utilizando AWS Lambda](#schema4)
 5. [Almacenamiento en Amazon RDS](#schema5)
 6. [Unable to import module 'lambda_function': No module named 'pymysql'](#schema6)
+7. [Almacenamiento en Amazon Athena](#schema7)
 
 <hr>
 
@@ -318,3 +319,18 @@ En la consola de Lambda, crea un evento de prueba que simule un evento S3.
 2. Ejecuta la Función y Verifica los Logs:
 Ejecuta la función Lambda y verifica los logs en CloudWatch para asegurarte de que la función se está ejecutando correctamente y que los datos se insertan en RDS como se espera.
 
+<hr>
+
+<a name="schema7"></a>
+
+## 7. Almacenamiento en Amazon Athena
+
+### **Paso 1: Definir Tablas en Amazon Athena**
+Utiliza la consola de Athena para definir tablas que apuntan a tus datos en S3.
+
+1. Abrir Athena:
+
+    - Ve a la consola de Athena.
+Definir la tabla:
+
+En el editor de consultas, escribe una consulta CREATE TABLE para definir la estructura de tu tabla y especificar la ubicación de los datos en S3.
