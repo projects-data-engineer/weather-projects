@@ -325,12 +325,58 @@ Ejecuta la función Lambda y verifica los logs en CloudWatch para asegurarte de 
 
 ## 7. Almacenamiento en Amazon Athena
 
+### **Paso 0: para Configurar un Bucket de S3 para Athena**
+1. Crear un Bucket de S3 para guardar los resultados de las queries.
+2. Crear una carpeta.
+
+
 ### **Paso 1: Definir Tablas en Amazon Athena**
 Utiliza la consola de Athena para definir tablas que apuntan a tus datos en S3.
 
 1. Abrir Athena:
 
     - Ve a la consola de Athena.
-Definir la tabla:
+2. Definir la tabla:
 
-En el editor de consultas, escribe una consulta CREATE TABLE para definir la estructura de tu tabla y especificar la ubicación de los datos en S3.
+    - En el editor de consultas, escribe una consulta CREATE TABLE para definir la estructura de tu tabla y especificar la ubicación de los datos en S3.
+    ```sql
+        CREATE EXTERNAL TABLE IF NOT EXISTS weather_data (
+    city STRING,
+    temperature DOUBLE,
+    weather STRING,
+    timestamp BIGINT
+    )
+    ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+    WITH SERDEPROPERTIES (
+    'serialization.format' = '1'
+    ) LOCATION 's3://tu-bucket/datos/weather/'
+    TBLPROPERTIES ('has_encrypted_data'='false');
+
+    ```
+    - `CREATE EXTERNAL TABLE`: Esta declaración se utiliza para crear una tabla externa en Amazon Athena. Una tabla externa significa que los datos no se almacenan en Athena, sino en una ubicación externa, como Amazon S3.
+    -   `ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'`:
+
+        - `ROW FORMAT SERDE`: Esta cláusula especifica cómo se debe interpretar el formato de las filas.
+        - `'org.openx.data.jsonserde.JsonSerDe'`: Especifica el uso del `SerDe` (Serializer/Deserializer) para JSON. SerDe es una clase que le dice a Athena cómo interpretar los datos JSON.
+    - `WITH SERDEPROPERTIES ('serialization.format' = '1'):`
+
+        - `WITH SERDEPROPERTIES`: Permite especificar propiedades adicionales para el `SerDe`.
+        - `'serialization.format' = '1'`: Esta propiedad específica le dice al `SerDe` cómo serializar los datos. En este caso, '1' es un valor estándar para JSON.
+    - `LOCATION 's3://tu-bucket/datos/weather/':`
+
+        - `LOCATION`: Especifica la ubicación de los datos en Amazon S3.
+        - `'s3://tu-bucket/datos/weather/'`: Es la ruta en S3 donde están almacenados los datos que esta tabla debe leer.
+    - `TBLPROPERTIES ('has_encrypted_data'='false')`:
+
+        - `TBLPROPERTIES`: Permite establecer propiedades adicionales para la tabla.
+        - `('has_encrypted_data'='false')`: Especifica que los datos no están encriptados. Si los datos estuvieran encriptados, se tendría que manejar de manera diferente.
+3. Asignar  la carpeta el bucket anterior a athena 
+
+### **Paso 2: Consultar los Datos en Athena**
+Una vez que la tabla esté definida, puedes ejecutar consultas SQL para analizar tus datos.
+
+Ejemplo de una consulta para obtener todos los datos:
+```sql
+SELECT * FROM weather_data;
+
+```
