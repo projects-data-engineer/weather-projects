@@ -8,6 +8,7 @@
 5. [Almacenamiento en Amazon RDS](#schema5)
 6. [Unable to import module 'lambda_function': No module named 'pymysql'](#schema6)
 7. [Almacenamiento en Amazon Athena](#schema7)
+8. [Recursos de usados en este proyecto](#schema8)
 
 <hr>
 
@@ -380,3 +381,21 @@ Ejemplo de una consulta para obtener todos los datos:
 SELECT * FROM weather_data;
 
 ```
+
+### **Paso 3: Visualización de los datos en Athena**
+
+[Código](./visualization/visual_function.py)
+
+![Visual](./img/visual.png)
+
+
+
+<hr>
+
+<a name="schema8"></a>
+
+## 8. Recursos de usados en este proyecto
+
+- Python
+- Librerías de python: Boto3, pandas, time, matplotlib, seaborn, datetime, json, pymysql, os, dotenv, requests, glob
+- Recursos de AWS: Lambda, S3, RDS, Athena, Glue, IAM, security group.
